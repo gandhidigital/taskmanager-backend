@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import './TaskForm.css'; // Reutiliza estilos del modal de creación
+import './TaskForm.css';
 
-function EditTaskModal({ task, users, onClose, onSave }) {
+function EditTaskModal({ task, users, onClose, onSave, isSubtask }) {
   const [title, setTitle] = useState('');
   const [status, setStatus] = useState('');
   const [responsible, setResponsible] = useState('');
@@ -33,75 +33,85 @@ function EditTaskModal({ task, users, onClose, onSave }) {
     onClose();
   };
 
+  const buttonStyle = {
+    backgroundColor: isSubtask ? '#F5A623' : '#7037FA',
+    color: isSubtask ? 'black' : 'white',
+  };
+
+  const cancelClass = isSubtask ? 'cancel-button yellow' : 'cancel-button';
+
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
-        <h2>Editar Tarea</h2>
+      <div className="modal-content form-container">
+        <h2>{isSubtask ? 'Editar Subtarea' : 'Editar Tarea'}</h2>
 
-        <label>Título:</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <div className="form-group full-width">
+          <label>Título:</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
 
-        <label>Estado:</label>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">Selecciona</option>
-          <option value="nueva">Nueva</option>
-          <option value="trabajando">Trabajando</option>
-          <option value="bloqueada">Bloqueada</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="completada">Completada</option>
-        </select>
+        <div className="form-group full-width">
+          <label>Estado:</label>
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="">Selecciona</option>
+            <option value="nueva">Nueva</option>
+            <option value="trabajando">Trabajando</option>
+            <option value="bloqueada">Bloqueada</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="completada">Completada</option>
+          </select>
+        </div>
 
-        <label>Responsable:</label>
-        <select
-          value={responsible}
-          onChange={(e) => setResponsible(e.target.value)}
-        >
-          <option value="">Selecciona</option>
-          {users.map((user) => (
-            <option key={user._id} value={user._id}>
-              {user.name}
-            </option>
-          ))}
-        </select>
+        <div className="form-group">
+          <label>Responsable:</label>
+          <select value={responsible} onChange={(e) => setResponsible(e.target.value)}>
+            <option value="">Selecciona</option>
+            {users.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <label>Validador:</label>
-        <select
-          value={validator}
-          onChange={(e) => setValidator(e.target.value)}
-        >
-          <option value="">Selecciona</option>
-          {users.map((user) => (
-            <option key={user._id} value={user._id}>
-              {user.name}
-            </option>
-          ))}
-        </select>
+        <div className="form-group">
+          <label>Validador:</label>
+          <select value={validator} onChange={(e) => setValidator(e.target.value)}>
+            <option value="">Selecciona</option>
+            {users.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <label>Fecha de entrega:</label>
-        <input
-          type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-        />
+        <div className="form-group">
+          <label>Fecha de entrega:</label>
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+          />
+        </div>
 
-        <label>Notas:</label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
+        <div className="form-group full-width">
+          <label>Notas:</label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </div>
 
         <div className="form-buttons">
-          <button onClick={handleSave} style={{ backgroundColor: '#7037FA' }}>
+          <button onClick={handleSave} style={buttonStyle}>
             Guardar cambios
           </button>
-          <button onClick={onClose} className="cancel-button">
+          <button onClick={onClose} className={cancelClass}>
             Cancelar
           </button>
         </div>

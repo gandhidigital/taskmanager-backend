@@ -119,4 +119,9 @@
 .icon-button:hover {
   transform: scale(1.1);
 }
-
+.icon-button.subtask {
+  width: 34px;
+  height: 34px;
+  padding: 4px;
+  transform: scale(1.05);
+}

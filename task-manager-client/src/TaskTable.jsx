@@ -5,6 +5,7 @@ import EditTaskModal from './EditTaskModal';
 function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
   const [expandedTasks, setExpandedTasks] = useState([]);
   const [modalTask, setModalTask] = useState(null);
+  const [isSubtaskEdit, setIsSubtaskEdit] = useState(false);
 
   const toggleSubtasks = (taskId) => {
     setExpandedTasks((prev) =>
@@ -17,12 +18,14 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
     return user ? user.name : '';
   };
 
-  const handleOpenModal = (task) => {
+  const handleOpenModal = (task, isSubtask = false) => {
     setModalTask(task);
+    setIsSubtaskEdit(isSubtask);
   };
 
   const handleCloseModal = () => {
     setModalTask(null);
+    setIsSubtaskEdit(false);
   };
 
   const handleSaveModal = async (updatedTask) => {
@@ -84,7 +87,7 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
               alt="Editar"
               title="Editar"
               className="icon-button"
-              onClick={() => handleOpenModal(task)}
+              onClick={() => handleOpenModal(task, false)}
             />
           </td>
         </tr>
@@ -103,7 +106,15 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
               <td>{subtask.dueDate ? new Date(subtask.dueDate).toLocaleDateString() : ''}</td>
               <td>{subtask.notes}</td>
               <td></td>
-              <td></td>
+              <td className="action-cell">
+                <img
+                  src="/icons/edit.svg"
+                  alt="Editar Subtarea"
+                  title="Editar Subtarea"
+                  className="icon-button subtask"
+                  onClick={() => handleOpenModal(subtask, true)}
+                />
+              </td>
             </tr>
           ))}
       </React.Fragment>
@@ -133,6 +144,7 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
       {modalTask && (
         <EditTaskModal
           task={modalTask}
+          isSubtask={isSubtaskEdit}
           onClose={handleCloseModal}
           onSave={handleSaveModal}
           users={users}
