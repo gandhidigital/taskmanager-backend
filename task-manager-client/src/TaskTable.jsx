@@ -1,20 +1,47 @@
 import React, { useState } from 'react';
 import './TaskTable.css';
+import EditTaskModal from './EditTaskModal';
 
 function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
   const [expandedTasks, setExpandedTasks] = useState([]);
+  const [modalTask, setModalTask] = useState(null);
 
   const toggleSubtasks = (taskId) => {
     setExpandedTasks((prev) =>
-      prev.includes(taskId)
-        ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId]
+      prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
     );
   };
 
   const getUserName = (userId) => {
     const user = users.find((u) => u._id === userId);
     return user ? user.name : '';
+  };
+
+  const handleOpenModal = (task) => {
+    setModalTask(task);
+  };
+
+  const handleCloseModal = () => {
+    setModalTask(null);
+  };
+
+  const handleSaveModal = async (updatedTask) => {
+    const newTasks = tasks.map((task) =>
+      task._id === updatedTask._id ? updatedTask : task
+    );
+    setTasks(newTasks);
+
+    try {
+      await fetch(`/api/tasks/${updatedTask._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTask),
+      });
+    } catch (error) {
+      console.error('❌ Error al guardar los cambios desde el modal:', error);
+    }
+
+    handleCloseModal();
   };
 
   const renderTaskRow = (task) => {
@@ -25,17 +52,12 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
       <React.Fragment key={task._id}>
         <tr className="task-row">
           <td>
-            <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-              {task.title}
+            {task.title}
+            <span style={{ marginLeft: '10px', color: '#F5333E', fontSize: '12px' }}>
               {subtasks.length > 0 && (
                 <button
                   className="toggle-button"
                   onClick={() => toggleSubtasks(task._id)}
-                  style={{
-                    marginLeft: '10px',
-                    fontSize: '12px',
-                    color: '#F5333E',
-                  }}
                 >
                   {isExpanded ? '▼' : '▶'}
                 </button>
@@ -56,6 +78,15 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
               + Agregar
             </button>
           </td>
+          <td className="action-cell">
+            <img
+              src="/icons/edit.svg"
+              alt="Editar"
+              title="Editar"
+              className="icon-button"
+              onClick={() => handleOpenModal(task)}
+            />
+          </td>
         </tr>
 
         {isExpanded &&
@@ -72,6 +103,7 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
               <td>{subtask.dueDate ? new Date(subtask.dueDate).toLocaleDateString() : ''}</td>
               <td>{subtask.notes}</td>
               <td></td>
+              <td></td>
             </tr>
           ))}
       </React.Fragment>
@@ -81,22 +113,32 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
   const parentTasks = tasks.filter((t) => !t.parentTask);
 
   return (
-    <table className="task-table">
-      <thead>
-        <tr>
-          <th>Título</th>
-          <th>Estado</th>
-          <th>Responsable</th>
-          <th>Validador</th>
-          <th>Entrega</th>
-          <th>Notas</th>
-          <th>Subtareas</th>
-        </tr>
-      </thead>
-      <tbody>
-        {parentTasks.map((task) => renderTaskRow(task))}
-      </tbody>
-    </table>
+    <>
+      <table className="task-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Estado</th>
+            <th>Responsable</th>
+            <th>Validador</th>
+            <th>Entrega</th>
+            <th>Notas</th>
+            <th>Subtareas</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>{parentTasks.map((task) => renderTaskRow(task))}</tbody>
+      </table>
+
+      {modalTask && (
+        <EditTaskModal
+          task={modalTask}
+          onClose={handleCloseModal}
+          onSave={handleSaveModal}
+          users={users}
+        />
+      )}
+    </>
   );
 }
 
