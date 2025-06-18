@@ -1,74 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import TaskTable from './TaskTable';
 import TaskForm from './TaskForm';
-import { fetchTasks, fetchUsers, createTask } from './api';
-import logo from './assets/Upload.svg'; // Logo importado
+import './App.css';
+import logo from './assets/Upload.svg'; // ← Corrección aquí
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedParentTask, setSelectedParentTask] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [parentTaskId, setParentTaskId] = useState(null);
   const [isSubtask, setIsSubtask] = useState(false);
 
   useEffect(() => {
-    loadData();
+    fetchTasks();
+    fetchUsers();
   }, []);
 
-  const loadData = async () => {
+  const fetchTasks = async () => {
     try {
-      const [tasksData, usersData] = await Promise.all([
-        fetchTasks(),
-        fetchUsers()
-      ]);
-      setTasks(tasksData);
-      setUsers(usersData);
+      const response = await axios.get('/api/tasks');
+      setTasks(response.data);
     } catch (error) {
-      console.error('Error al cargar datos:', error);
+      console.error('Error fetching tasks:', error);
     }
   };
 
-  const handleCreateTask = () => {
-    setSelectedParentTask(null);
-    setIsSubtask(false);
-    setIsModalOpen(true);
-  };
-
-  const handleCreateSubtask = (parentId) => {
-    setSelectedParentTask(parentId);
-    setIsSubtask(true);
-    setIsModalOpen(true);
-  };
-
-  const handleSubmitTask = async (taskData) => {
+  const fetchUsers = async () => {
     try {
-      const newTask = await createTask(taskData);
-      setTasks((prevTasks) => [...prevTasks, newTask]);
-      setIsModalOpen(false);
+      const response = await axios.get('/api/users');
+      setUsers(response.data);
     } catch (error) {
-      console.error('Error al crear tarea:', error);
+      console.error('Error fetching users:', error);
     }
+  };
+
+  const handleCreateTask = async (taskData) => {
+    try {
+      const response = await axios.post('/api/tasks', taskData);
+      setTasks([...tasks, response.data]);
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
+  };
+
+  const handleOpenForm = (parentId = null) => {
+    setIsSubtask(!!parentId);
+    setParentTaskId(parentId);
+    setShowForm(true);
   };
 
   return (
-    <div
-      className="App"
-      style={{ backgroundColor: '#262026', minHeight: '100vh' }}
-    >
-      <img src={logo} alt="Task Manager Logo" className="logo" />
+    <div className="App">
+<div className="header">
+  <img src={logo} alt="Logo" className="logo" />
+  <div className="crear-tarea-container">
+    <button className="btn-crear-tarea" onClick={() => handleOpenForm()}>
+      Crear nueva tarea
+    </button>
+  </div>
+</div>
 
-      <button onClick={handleCreateTask} className="btn-crear-tarea">
-        Crear nueva tarea
-      </button>
+      <TaskTable
+        tasks={tasks}
+        setTasks={setTasks}
+        onCreateSubtask={handleOpenForm}
+        users={users}
+      />
 
-      <TaskTable tasks={tasks} onCreateSubtask={handleCreateSubtask} />
-
-      {isModalOpen && (
+      {showForm && (
         <TaskForm
-          onSubmit={handleSubmitTask}
-          onClose={() => setIsModalOpen(false)}
-          parentTask={selectedParentTask}
+          onSubmit={handleCreateTask}
+          onClose={() => setShowForm(false)}
+          parentTask={parentTaskId}
           isSubtask={isSubtask}
           users={users}
         />

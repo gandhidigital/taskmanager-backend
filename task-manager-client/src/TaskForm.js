@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import './TaskForm.css';
 
-function TaskForm({ onSubmit, onClose, parentTask, isSubtask, users }) {
+function TaskForm({ onSubmit, onClose, parentTask, isSubtask, users = [] }) {
   const [formData, setFormData] = useState({
     title: '',
     status: '',
-    assignee: '',
+    responsible: '',
     validator: '',
     dueDate: '',
     notes: '',
-    parentTask: parentTask || null
+    parentTask: isSubtask ? parentTask : null
   });
 
   useEffect(() => {
-    setFormData((prev) => ({ ...prev, parentTask }));
-  }, [parentTask]);
+    if (isSubtask) {
+      setFormData((prev) => ({ ...prev, parentTask }));
+    }
+  }, [parentTask, isSubtask]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,6 +29,7 @@ function TaskForm({ onSubmit, onClose, parentTask, isSubtask, users }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
+    onClose();
   };
 
   return (
@@ -45,27 +48,27 @@ function TaskForm({ onSubmit, onClose, parentTask, isSubtask, users }) {
             />
           </div>
 
-<div className="form-group full-width">
-  <select
-    name="status"
-    value={formData.status}
-    onChange={handleChange}
-    required
-  >
-    <option value="">Selecciona estado</option>
-    <option value="Por hacer">Por hacer</option>
-    <option value="En progreso">En progreso</option>
-    <option value="Bloqueado">Bloqueado</option>
-    <option value="Validación">Validación</option>
-    <option value="Completado">Completado</option>
-  </select>
-</div>
+          <div className="form-group full-width">
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Selecciona estado</option>
+              <option value="Nueva">Nueva</option>
+              <option value="Trabajando">Trabajando</option>
+              <option value="Bloqueada">Bloqueada</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Completada">Completada</option>
+            </select>
+          </div>
 
           <div className="form-row">
             <div className="form-group">
               <select
-                name="assignee"
-                value={formData.assignee}
+                name="responsible"
+                value={formData.responsible}
                 onChange={handleChange}
               >
                 <option value="">Responsable</option>

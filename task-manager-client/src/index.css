@@ -5,9 +5,7 @@
 /* Tipografías globales */
 body {
   margin: 0;
-  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Nunito', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -16,12 +14,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* Estilos de títulos si quieres forzarlos desde aquí */
-h1, h2, h3, h4 {
-  font-family: 'Montserrat', sans-serif;}
+h1, h2, h3, h4, h5, h6, th {
+  font-family: 'Montserrat', sans-serif;
+}
 
 html, body, #root, .App {
-  background-color: #262026 !important;
+  background-color: #262026;
   min-height: 100vh;
 }
 

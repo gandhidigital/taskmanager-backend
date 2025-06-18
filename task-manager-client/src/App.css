@@ -18,19 +18,30 @@ h1, h2, h3, h4, h5, h6 {
   padding: 40px;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #262026; /* Asegura que el fondo sea plano */
+  background-color: #262026;
+}
+
+/* NUEVO: alineación del logo y botón */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
 }
 
 .logo {
-  height: 120px;
+  height: 100px;
   display: block;
-  margin-bottom: 24px;
+}
+
+.crear-tarea-container {
+  margin-top: 12px;
 }
 
 button {
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
-  border-radius: 6px;
+  border-radius: 9999px; /* pill */
   padding: 10px 16px;
   cursor: pointer;
   font-weight: bold;
@@ -44,7 +55,6 @@ button:hover {
 .btn-crear-tarea {
   background-color: #F5333E;
   color: white;
-  margin-bottom: 24px;
 }
 
 table {
@@ -92,21 +102,5 @@ textarea {
 input::placeholder,
 textarea::placeholder {
   color: #cccccc;
-}
-
-.btn-subtarea {
-  background-color: transparent;
-  border: 1px solid #F5333E;
-  color: #F5333E;
-  padding: 4px 10px;
-  font-size: 16px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-subtarea:hover {
-  background-color: #F5333E;
-  color: white;
 }
 

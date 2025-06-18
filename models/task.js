@@ -8,6 +8,12 @@ const taskSchema = new mongoose.Schema({
   priority: { type: String },
   dueDate: { type: Date },
   notes: { type: String },
+  parentTask: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Task',
+    default: null
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
+
