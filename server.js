@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const User = require('./models/User');
-const Task = require('./models/Task');
+const Task = require('./models/task');
 const normalizeStatus = require('./utils/normalizeStatus');
 
 const app = express();
