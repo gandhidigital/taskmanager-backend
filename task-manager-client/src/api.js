@@ -1,7 +1,8 @@
 // src/api.js
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+// ✅ Asegúrate de poner tu URL real de Render aquí:
+const API_BASE_URL = 'https://taskmanager-backend.onrender.com/api';
 
 // Obtener todas las tareas
 export const fetchTasks = async () => {
@@ -23,11 +24,11 @@ export const createTask = async (taskData) => {
 
 // Actualizar una tarea
 export const updateTask = async (taskId, updatedData) => {
-  const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}`, updatedData);
+  const response = await axios.patch(`${API_BASE_URL}/tasks/${taskId}`, updatedData); // usas PATCH, no PUT
   return response.data;
 };
 
-// Eliminar una tarea
+// Eliminar una tarea (si más adelante implementas esta ruta)
 export const deleteTask = async (taskId) => {
   const response = await axios.delete(`${API_BASE_URL}/tasks/${taskId}`);
   return response.data;
