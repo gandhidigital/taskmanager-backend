@@ -6,6 +6,8 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
   const [expandedTasks, setExpandedTasks] = useState([]);
   const [modalTask, setModalTask] = useState(null);
   const [isSubtaskEdit, setIsSubtaskEdit] = useState(false);
+  const [editingStatusId, setEditingStatusId] = useState(null);
+  const [tempStatus, setTempStatus] = useState('');
 
   const toggleSubtasks = (taskId) => {
     setExpandedTasks((prev) =>
@@ -47,6 +49,61 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
     handleCloseModal();
   };
 
+  const handleStatusClick = (task) => {
+    setEditingStatusId(task._id);
+    setTempStatus(task.status);
+  };
+
+  const handleStatusChange = (e) => {
+    setTempStatus(e.target.value);
+  };
+
+  const handleStatusBlur = async (task) => {
+    const updatedTask = { ...task, status: tempStatus };
+
+    const newTasks = tasks.map((t) =>
+      t._id === task._id ? updatedTask : t
+    );
+    setTasks(newTasks);
+
+    try {
+      await fetch(`/api/tasks/${task._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTask),
+      });
+    } catch (error) {
+      console.error('❌ Error al guardar el nuevo estado:', error);
+    }
+
+    setEditingStatusId(null);
+  };
+
+  const renderStatusCell = (task) => {
+    return editingStatusId === task._id ? (
+      <select
+        className="status-dropdown"
+        value={tempStatus}
+        onChange={handleStatusChange}
+        onBlur={() => handleStatusBlur(task)}
+        autoFocus
+      >
+        <option value="nueva">Nueva</option>
+        <option value="trabajando">Trabajando</option>
+        <option value="bloqueada">Bloqueada</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="completada">Completada</option>
+      </select>
+    ) : (
+      <span
+        className={`task-pill ${task.status?.toLowerCase().replace(/\s/g, '-') || ''}`}
+        onClick={() => handleStatusClick(task)}
+      >
+        {task.status}
+      </span>
+    );
+  };
+
   const renderTaskRow = (task) => {
     const isExpanded = expandedTasks.includes(task._id);
     const subtasks = tasks.filter((t) => t.parentTask === task._id);
@@ -56,22 +113,18 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
         <tr className="task-row">
           <td>
             {task.title}
-            <span style={{ marginLeft: '10px', color: '#F5333E', fontSize: '12px' }}>
-              {subtasks.length > 0 && (
+            {subtasks.length > 0 && (
+              <span style={{ marginLeft: '10px' }}>
                 <button
                   className="toggle-button"
                   onClick={() => toggleSubtasks(task._id)}
                 >
                   {isExpanded ? '▼' : '▶'}
                 </button>
-              )}
-            </span>
+              </span>
+            )}
           </td>
-          <td>
-            <span className={`task-pill ${task.status?.toLowerCase().replace(/\s/g, '-') || ''}`}>
-              {task.status}
-            </span>
-          </td>
+          <td>{renderStatusCell(task)}</td>
           <td>{getUserName(task.responsible)}</td>
           <td>{getUserName(task.validator)}</td>
           <td>{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}</td>
@@ -96,11 +149,7 @@ function TaskTable({ tasks, setTasks, onCreateSubtask, users }) {
           subtasks.map((subtask) => (
             <tr key={subtask._id} className="subtask-row">
               <td>{subtask.title}</td>
-              <td>
-                <span className={`task-pill ${subtask.status?.toLowerCase().replace(/\s/g, '-') || ''}`}>
-                  {subtask.status}
-                </span>
-              </td>
+              <td>{renderStatusCell(subtask)}</td>
               <td>{getUserName(subtask.responsible)}</td>
               <td>{getUserName(subtask.validator)}</td>
               <td>{subtask.dueDate ? new Date(subtask.dueDate).toLocaleDateString() : ''}</td>
